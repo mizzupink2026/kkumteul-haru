@@ -402,6 +402,42 @@ header.top{background:var(--hdr2,#BCD9EC);color:var(--hdr-on,#24384A);box-shadow
 header.top .brand small,header.top .sync{color:var(--hdr-sub,#68808F)}
 header.top .tool{background:rgba(255,255,255,.92);border-color:transparent}
 @container app (min-width: 820px){ header.top{border-bottom:0;border-radius:0 0 20px 20px} .side{top:calc(var(--pvh) + 88px)} }
+
+/* ── 휴대폰 오늘 화면: 영어 문장 → 메모 → 국화+오늘 일정 → 영역 ── */
+.pc-only{display:none}
+.memo.inline{position:static;order:0;border:1px solid var(--line);border-radius:16px;box-shadow:var(--cat-sh);background:var(--card);margin:0 0 10px;padding:10px 12px 8px}
+.memo.inline .mh{margin-bottom:6px}
+.herocard{padding:10px 12px}
+.herocard .hero{align-items:flex-start;gap:10px}
+.herocard .bloom svg{width:78px;height:78px}
+.herocard .bloom .pct{font-size:17px;margin-top:-6px}
+.herocard .msg{flex:1;min-width:0}
+.herocard .chips{margin-top:0}
+.hev{margin-top:8px;border-top:1px dashed var(--line);padding-top:6px}
+.hev-h{display:flex;align-items:center;font-size:12.5px;font-weight:700;color:var(--sub);margin-bottom:2px}
+.hev-h a{margin-left:auto;font-weight:400;font-size:12px}
+.hev .ev{padding:4px 0}
+.hev .ev .tt{font-size:13.5px}
+.hev .ev .tm{min-width:38px;font-size:12px}
+.hev .evck{width:18px;height:18px}
+.hev .edit{font-size:14px}
+.quote.q-m{margin-bottom:10px}
+@container app (min-width: 820px){
+  .pc-only{display:block}
+  .hev{display:none}
+  .herocard{padding:14px}
+  .herocard .hero{align-items:center}
+  .herocard .bloom svg{width:118px;height:118px}
+}
+/* 좁은 휴대폰: 제목 줄이 한 화면에 다 들어오게 */
+@container app (max-width: 430px){
+  header.top{padding:10px 10px 8px 12px;gap:6px}
+  .brand{font-size:18px;gap:4px;min-width:0}
+  .brand small{display:none}
+  #brandIco svg{width:38px;height:38px}
+  .tool{height:34px;min-width:34px;padding:0 7px;font-size:15px}
+  .sync{gap:0}
+}
 </style>
 </head>
 <body>
@@ -724,9 +760,16 @@ function linkTag(l,cls,inner){
 
 /* ---------- 렌더링 ---------- */
 const $main=document.getElementById('main');
+function placeMemo(){   // 휴대폰: 오늘 화면의 영어 문장 바로 아래 / PC: 왼쪽 사이드바
+  const narrow=document.querySelector('.app').clientWidth<820, slot=document.getElementById('memoSlot'), side=document.querySelector('.side');
+  if(narrow && slot){ slot.appendChild($memo); $memo.classList.add('inline'); $memo.style.display=''; }
+  else if(narrow){ $memo.style.display='none'; }
+  else { side.appendChild($memo); $memo.classList.remove('inline'); $memo.style.display=''; }
+}
 function render(){
   document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('on',b.dataset.tab===ui.tab));
   ({today:vToday,stats:vStats,sched:vSched,set:vSet})[ui.tab]();
+  placeMemo();
 }
 function cheer(p,left){
   if(p===null) return '이 날은 계획이 없어요.<br>아래에서 씨앗 하나를 심어 볼까요?';
@@ -738,8 +781,7 @@ function cheer(p,left){
 }
 function quoteCard(d,cls){
   const q=quoteFor(d);
-  return `<div class="card quote ${cls}"><h3>🌼 이번 주의 문장</h3><div class="en">“${esc(q.en)}”</div><div class="by">— ${esc(q.by)}</div>
-  <details><summary>해석 · 표현 포인트 보기 ▾</summary><div>${esc(q.ko)}</div><div class="tip">📌 ${esc(q.tip)}</div></details></div>`;
+  return `<div class="card quote ${cls}"><h3>🌼 이번 주의 문장</h3><div class="en">“${esc(q.en)}”</div><div class="by">— ${esc(q.by)}</div></div>`;
 }
 function dockCard(){
   const L=[...S.links].sort((a,b)=>a.order-b.order); if(!L.length) return '';
@@ -771,16 +813,16 @@ function vToday(){
     <div class="d">${label(d)}<small>${isT?'오늘':`<a href="#" data-act="gotoday">오늘로 돌아가기</a>`}</small></div>
     <button class="iconbtn" data-act="day" data-n="1">›</button></div>
   ${quoteCard(d,'q-m')}
+  <div id="memoSlot"></div>
   <div class="two"><div>
-    <div class="card"><div class="hero"><div class="bloom">${flower(dayFr(d),118)}<div class="pct">${p===null?'–':Math.round(p*100)}<small>${p===null?'':'%'}</small></div></div>
-      <div class="msg">${cheer(p,left)}
-      <div class="chips"><span class="chip gold">🌼 연속 ${streak()}일</span><span class="chip">${its.filter(i=>frac(d,i)>=1).length} / ${its.length} 완료</span>${evs.length?`<span class="chip">🗓️ 일정 ${evs.length}</span>`:''}</div></div></div></div>
+    <div class="card herocard"><div class="hero"><div class="bloom">${flower(dayFr(d),118)}<div class="pct">${p===null?'–':Math.round(p*100)}<small>${p===null?'':'%'}</small></div></div>
+      <div class="msg"><div class="chips"><span class="chip gold">🌼 연속 ${streak()}일</span><span class="chip">${its.filter(i=>frac(d,i)>=1).length} / ${its.length} 완료</span></div>
+      <div class="hev"><div class="hev-h">🗓️ ${isT?'오늘':''} 일정<a href="#" data-act="newEvent">＋ 추가</a></div>${evs.length?evs.map(evRow).join(''):'<div class="muted">일정이 없어요.</div>'}</div></div></div></div>
     <div class="toggles"><button data-act="catAll" data-v="1">모두 펼치기</button><button data-act="catAll" data-v="0">모두 접기</button></div>
     ${list}
-    <button class="add" data-act="newItem">＋ 할 일 · 습관 심기</button>
   </div><div>
     ${quoteCard(d,'q-pc')}
-    <div class="card"><h3>🗓️ ${isT?'오늘':''} 일정<a class="more" href="#" data-act="newEvent">＋ 추가</a></h3>${evHtml}</div>
+    <div class="card pc-only"><h3>🗓️ ${isT?'오늘':''} 일정<a class="more" href="#" data-act="newEvent">＋ 추가</a></h3>${evHtml}</div>
     ${dockCard()}
   </div></div>`;
 }
@@ -1093,7 +1135,7 @@ let toastT, toastFn=null; function toast(m,btn,fn){const t=document.getElementBy
   t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show','act'),fn?5000:2000);}
 document.addEventListener('click',e=>{
   const pvb=e.target.closest('[data-pv]');
-  if(pvb){ document.body.classList.toggle('mobile',pvb.dataset.pv==='mobile'); document.querySelectorAll('[data-pv]').forEach(b=>b.classList.toggle('on',b===pvb)); return; }
+  if(pvb){ setTimeout(placeMemo,30); document.body.classList.toggle('mobile',pvb.dataset.pv==='mobile'); document.querySelectorAll('[data-pv]').forEach(b=>b.classList.toggle('on',b===pvb)); return; }
   const tb=e.target.closest('#tabs button'); if(tb){ ui.tab=tb.dataset.tab; render(); scrollTop(); return; }
   const el=e.target.closest('[data-act]'); if(!el) return;
   const a=el.dataset.act, id=el.dataset.id;
@@ -1357,6 +1399,7 @@ render(); renderMemo();
 if(!DEMO()){ pull(); setInterval(()=>{ if(document.visibilityState==='visible') pull(); }, 60000); }
 document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible') pull(); });
 window.addEventListener('online',()=>flush());
+window.addEventListener('resize',()=>placeMemo());
 </script>
 </body>
 </html>
