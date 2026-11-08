@@ -11,7 +11,7 @@
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="manifest" href="manifest.json">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Noto+Sans+KR:wght@400;500;700&family=Lora:ital@1&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&family=Noto+Sans+KR:wght@400;500;700&family=Nunito:wght@500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#f7f3ea; --card:#fffdf8; --ink:#2b2824; --sub:#7a7268; --line:#e9e1d3;
@@ -53,7 +53,7 @@ button.icoprev{border:1px solid var(--line);border-radius:10px;background:#fff;h
 .emgrid button:hover,.emgrid button.on{background:var(--gold-soft);border-color:#f1dfb8}
 .icoprev{display:flex;align-items:center;justify-content:center;width:42px;flex:none}
 .cat-h svg,.opts svg,.vote svg,.dock h4 svg,.grid7 svg{vertical-align:-0.25em}
-.brand small{white-space:nowrap;display:block;font-family:"Lora",serif;font-style:italic;font-weight:400;font-size:11.5px;color:var(--sub);margin-top:2px}
+.brand small{white-space:nowrap;display:block;font-family:"Nunito",sans-serif;font-style:normal;font-weight:600;font-size:11.5px;color:var(--sub);margin-top:2px}
 .sync{font-size:12px;color:var(--sub);display:flex;align-items:center;gap:5px;white-space:nowrap}
 .sync span{white-space:nowrap}
 @media (max-width:420px){ .sync span{display:none} }
@@ -104,7 +104,7 @@ main{flex:1;padding:4px 14px 20px}
 /* 이번 주의 문장 */
 .quote{background:linear-gradient(135deg,#fffaf0,#fcf0d8);border:1px solid #f1dfb8}
 .q-pc{display:none}
-.quote .en{font-family:"Lora",Georgia,serif;font-style:italic;font-size:16px;line-height:1.55;margin:2px 0 6px}
+.quote .en{font-family:"Nunito",sans-serif;font-style:normal;font-weight:600;font-size:16px;line-height:1.55;margin:2px 0 6px}
 .quote .by{font-size:12px;color:#9a6512}
 .quote details{margin-top:8px;font-size:13px;line-height:1.6}
 .quote summary{cursor:pointer;color:var(--sub);font-size:12.5px;list-style:none}
@@ -226,7 +226,7 @@ main{flex:1;padding:4px 14px 20px}
 #splash .st{text-align:center;opacity:0;transform:translateY(8px);transition:.5s;margin-top:-6px}
 #splash.txt .st{opacity:1;transform:none}
 #splash .st b{display:block;font-family:"Gowun Batang",serif;font-size:24px}
-#splash .st span{font-family:"Lora",serif;font-style:italic;color:#c24d7e;font-size:15px}
+#splash .st span{font-family:"Nunito",sans-serif;font-weight:700;color:#c24d7e;font-size:15px}
 /* 모달 */
 .modal{position:fixed;inset:0;background:rgba(30,25,20,.42);display:none;align-items:flex-end;justify-content:center;z-index:100}
 .modal.show{display:flex}
@@ -258,9 +258,9 @@ body.mobile .sheet{max-width:390px}
 .mrow{display:flex;gap:6px;align-items:center;margin:6px 0 4px}
 .trn textarea{width:100%;border:1px solid var(--line);border-radius:12px;padding:10px;background:#fffef9;resize:vertical;line-height:1.5;font-size:15px}
 .trn .best{background:var(--accent-soft);border-radius:12px;padding:12px;margin-top:6px}
-.trn .best .en{font-family:"Lora",Georgia,serif;font-size:18px;line-height:1.5}
+.trn .best .en{font-family:"Nunito",sans-serif;font-weight:600;font-size:18px;line-height:1.5}
 .trn .alt{border-bottom:1px dashed var(--line);padding:10px 2px}
-.trn .alt .en2{font-family:"Lora",Georgia,serif;font-size:15.5px}
+.trn .alt .en2{font-family:"Nunito",sans-serif;font-weight:600;font-size:15.5px}
 .trn .alt .note{font-size:12.5px;color:var(--sub);margin-top:2px}
 .dict .ent.big b{font-size:19px}
 .mm{display:flex;gap:8px;align-items:flex-start;padding:9px 2px;border-bottom:1px dashed var(--line)}
@@ -438,6 +438,20 @@ header.top .tool{background:rgba(255,255,255,.92);border-color:transparent}
   .tool{height:34px;min-width:34px;padding:0 7px;font-size:15px}
   .sync{gap:0}
 }
+
+/* ── 글씨체: 제목 = 주아(글자 사이 살짝 띄움), 본문 = 고운돋움 ── */
+html,body,button,input,select,textarea{font-family:"Gowun Dodum","Noto Sans KR",system-ui,sans-serif}
+.brand{font-family:"Jua",sans-serif;font-weight:400;letter-spacing:.07em}
+.brand small{letter-spacing:0}
+.pagehead h2,#splash .st b{font-family:"Jua",sans-serif;font-weight:400;letter-spacing:.05em}
+.datebar .d{font-family:"Jua",sans-serif;font-weight:400;letter-spacing:.03em}
+.datebar .d small{font-family:"Gowun Dodum",sans-serif}
+.cat-h{font-family:"Jua",sans-serif;font-weight:400;letter-spacing:.03em}
+.cat-h .n{font-family:"Gowun Dodum",sans-serif;font-weight:700}
+.card h3,.dock summary,nav.tabs button{font-family:"Jua",sans-serif;font-weight:400;letter-spacing:.02em}
+.vote .l .i,.ident,.inp.id{font-family:"Gowun Dodum",sans-serif}
+.item .t,.memo,.ev .tt{font-family:"Gowun Dodum",sans-serif}
+.quote .by,.dict .ent,.dict .ex{font-family:"Nunito","Gowun Dodum",sans-serif}
 </style>
 </head>
 <body>
