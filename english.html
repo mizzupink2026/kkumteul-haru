@@ -410,7 +410,7 @@ nav.tabs button.on{color:var(--pri);background:var(--pri-soft)}
    데이터: '꿈틀나비 하루 DB' 시트의 cards 탭 (하루 앱과 같은 서버)
    서버 연결 정보(kn2_cfg)는 하루 앱과 함께 씀
    ========================================================= */
-const APP_VER='en-2026-11-12b';
+const APP_VER='en-2026-11-12c';
 const LS = { get(k,d,p='ke1_'){try{const v=localStorage.getItem(p+k);return v?JSON.parse(v):d}catch(e){return d}},
              set(k,v,p='ke1_'){try{localStorage.setItem(p+k,JSON.stringify(v))}catch(e){}} };
 let cfg = LS.get('cfg',{api:'',key:''},'kn2_');
@@ -502,7 +502,11 @@ const NOVELTY=/Albert|Bad News|Bahh|Bells|Boing|Bubbles|Cellos|Wobble|Zarvox|Tri
 function voiceRank(v){ const n=v.name; let s=0; if(/premium|enhanced|natural|neural|향상|고음질/i.test(n)) s+=50; if(/Google US English/.test(n)) s+=40; if(/^(Ava|Samantha|Allison|Zoe|Evan|Nathan|Tom|Susan|Joelle|Noelle|Aria|Jenny|Guy|Michelle)\b/.test(n)) s+=30; if(/en[-_]US/i.test(v.lang)) s+=10; if(NOVELTY.test(n)) s-=100; return s; }
 function pickVoice(){ const V=enVoices(); if(!V.length) return null; if(voxName){ const f=V.find(v=>v.name===voxName); if(f) return f; } return V.slice().sort((a,b)=>voiceRank(b)-voiceRank(a))[0]; }
 function setVoice(n){ voxName=n; LS.set('voice',n); VOX=null; }
-try{ speechSynthesis.addEventListener('voiceschanged',()=>{ VOX=null; }); }catch(e){}
+function voiceOpts(){ const V=enVoices().sort((a,b)=>voiceRank(b)-voiceRank(a));
+  return `<option value="">자동 (가장 자연스러운 목소리)</option>`+V.map(v=>`<option value="${esc(v.name)}" ${v.name===voxName?'selected':''}>${esc(v.name)}${/premium|enhanced|향상|고음질/i.test(v.name)?' ★':''} · ${esc(v.lang)}</option>`).join('')
+    +(V.length?'':`<option disabled>목소리를 불러오는 중…</option>`); }
+function refreshVoiceSel(){ const el=document.getElementById('voiceSel'); if(el){ el.innerHTML=voiceOpts(); const c=document.getElementById('voiceCnt'); if(c) c.textContent=`이 기기에서 찾은 영어 목소리 ${enVoices().length}개`; } }
+try{ speechSynthesis.getVoices(); speechSynthesis.addEventListener('voiceschanged',()=>{ VOX=null; refreshVoiceSel(); }); }catch(e){}
 let sayTip=LS.get('sayTip',false);
 const say=(t,btn)=>{ if(!t) return; if(!('speechSynthesis' in window)){ toast('이 브라우저는 음성 듣기를 지원하지 않아요'); return; }
   try{ const ss=speechSynthesis; if(ss.speaking||ss.pending) ss.cancel(); if(ss.paused) ss.resume();
@@ -1226,7 +1230,7 @@ const THEMES=[['t1','숲과 노을','#24555C',['#24555C','#7AAAA6','#0C0B0B','#E
 function applyTheme(){ let t=LS.get('theme','t1'); if(!THEMES.some(x=>x[0]===t)) t='t1'; const b=LS.get('bold',0); document.body.dataset.theme=t; document.body.dataset.bold=b?'1':'0';
   const m=document.querySelector('meta[name=theme-color]'); if(m) m.content=THEMES.find(x=>x[0]===t)[2]; }
 applyTheme();
-function settingsModal(){
+function settingsModal(){ setTimeout(refreshVoiceSel,50); setTimeout(refreshVoiceSel,800);
   openModal(`<div class="row" style="margin-bottom:10px"><h2 class="grow" style="margin:0">서버(구글 시트) 연결</h2><button class="btn sm" data-act="close">닫기</button></div>
     <div class="insight">꿈틀나비 하루와 <b>같은 웹 앱 주소와 비밀키</b>를 넣으면 돼요. 같은 브라우저에서 하루 앱을 이미 연결했다면 자동으로 연결되어 있어요.</div>
     <div class="field"><label>앱스스크립트 웹 앱 주소 (…/exec 로 끝나는 주소)</label><input class="inp" id="cfgApi" value="${esc(cfg.api)}" placeholder="https://script.google.com/macros/s/.../exec"></div>
@@ -1236,7 +1240,7 @@ function settingsModal(){
     <div class="themes">${THEMES.map(([k,n,bg,c])=>`<button class="${document.body.dataset.theme===k?'on':''}" data-act="theme" data-v="${k}"><div class="sw">${c.map(x=>`<i style="background:${x}"></i>`).join('')}</div>${n}</button>`).join('')}</div>
     <div class="seg" style="margin:10px 0 0"><button class="${LS.get('bold',0)?'':'on'}" data-act="bold" data-v="0">테두리 기본</button><button class="${LS.get('bold',0)?'on':''}" data-act="bold" data-v="1">테두리 진하게</button></div>
     <h2 style="margin:18px 0 8px">듣기 목소리</h2>
-    <div class="field"><label>휴대폰에 있는 영어 목소리 중에서 골라요</label><select class="inp" id="voiceSel" onchange="setVoice(this.value)"><option value="">자동 (가장 자연스러운 목소리)</option>${enVoices().sort((a,b)=>voiceRank(b)-voiceRank(a)).map(v=>`<option value="${esc(v.name)}" ${v.name===voxName?'selected':''}>${esc(v.name)} · ${esc(v.lang)}</option>`).join('')}</select></div>
+    <div class="field"><label>휴대폰에 있는 영어 목소리 중에서 골라요</label><select class="inp" id="voiceSel" onchange="setVoice(this.value)">${voiceOpts()}</select><div class="muted" id="voiceCnt" style="font-size:12px;margin-top:4px"></div></div>
     <button class="btn" data-act="voiceTest">▶︎ 미리 듣기</button>
     <div class="muted" style="font-size:12px;margin-top:8px;line-height:1.5">아이폰: 설정 → 손쉬운 사용 → 읽기 및 말하기 → 음성 → 영어에서 ‘향상됨’ 목소리(예: Ava, Zoe)를 내려받으면 더 자연스러워져요. 내려받은 뒤 앱을 다시 열어 주세요.</div>
     <div class="muted" style="font-size:12px;margin-top:14px">버전 ${APP_VER}</div>`);
