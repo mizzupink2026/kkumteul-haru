@@ -299,6 +299,20 @@ nav.tabs button.on{color:var(--pri);background:var(--pri-soft)}
 .cal span{width:28px;margin:0 auto}
 .learn .row .btn{white-space:nowrap;padding:8px 10px}
 .grad{display:block;margin:10px auto 0}
+/* ===== 날짜 줄 ===== */
+.dq .t{font-family:"Jua",sans-serif;font-size:16.5px;letter-spacing:.02em;color:var(--ink);white-space:nowrap}
+.dq .ic{width:17px;height:17px;vertical-align:0}
+.dq.e1{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:5px 6px 5px 14px}
+.dq.e1>.ic{color:var(--pri)}
+.dq.e1 .chip{margin-left:auto}
+.dq.e2{display:flex;align-items:stretch;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--card)}
+.dq.e2 .l{flex:1;display:flex;align-items:center;justify-content:center;gap:7px;padding:7px 10px}
+.dq.e2 .l .ic{color:var(--pri)}
+.dq.e2 .r{display:flex;align-items:center;gap:4px;padding:0 14px;background:var(--hi-soft);color:var(--hi-ink);font-family:"Jua",sans-serif;font-size:15px}
+.dq.e3{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:8px 12px}
+.dq.e3 i{width:5px;height:5px;border-radius:50%;background:var(--hi);display:inline-block}
+.dq.e3 em{font-style:normal;display:inline-flex;align-items:center;gap:3px;font-size:13px;color:var(--hi-ink)}
+.dq.e3 em .ic{width:14px;height:14px}
 /* ===== 홈: 한 화면에 담기 ===== */
 .home{display:flex;flex-direction:column;gap:8px}
 .home .card{margin:0}
@@ -378,7 +392,7 @@ nav.tabs button.on{color:var(--pri);background:var(--pri-soft)}
 <body>
 <div class="shell">
   <header class="top">
-    <div class="brand"><span id="logo"></span><div>꿈틀나비 Q&amp;A<small>Ask · Collect · Review · Use</small></div></div>
+    <div class="brand"><span id="logo"></span><div>꿈틀나비 Q&amp;A<small>Ask · Collect · Review</small></div></div>
     <div class="sync" id="sync"><i></i><span>이 기기에만 저장</span></div>
     <a class="tool" href="./" title="꿈틀나비 하루로" data-i="butterfly"></a>
     <button class="tool" data-act="settings" title="설정" data-i="gear"></button>
@@ -396,7 +410,7 @@ nav.tabs button.on{color:var(--pri);background:var(--pri-soft)}
    데이터: '꿈틀나비 하루 DB' 시트의 cards 탭 (하루 앱과 같은 서버)
    서버 연결 정보(kn2_cfg)는 하루 앱과 함께 씀
    ========================================================= */
-const APP_VER='en-2026-11-12a';
+const APP_VER='en-2026-11-12b';
 const LS = { get(k,d,p='ke1_'){try{const v=localStorage.getItem(p+k);return v?JSON.parse(v):d}catch(e){return d}},
              set(k,v,p='ke1_'){try{localStorage.setItem(p+k,JSON.stringify(v))}catch(e){}} };
 let cfg = LS.get('cfg',{api:'',key:''},'kn2_');
@@ -660,6 +674,12 @@ function monthCard(){
 function wkLabel(ds){ const sat=parse(addDays(ds,6-parse(ds).getDay())); return (sat.getMonth()+1)+'월 '+Math.ceil((sat.getDate()+new Date(sat.getFullYear(),sat.getMonth(),1).getDay())/7)+'주'; }
 function ringSvg(p){ const size=58, sw=5.5, r=(size-sw)/2, C=2*Math.PI*r;
   return `<svg viewBox="0 0 ${size} ${size}"><circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="var(--card)" stroke-width="${sw}"/>${p>0?`<circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="var(--pri)" stroke-width="${sw}" stroke-linecap="round" stroke-dasharray="${C*p} ${C}"/>`:''}</svg>`; }
+/* 날짜 줄: 하루 앱처럼 둥근 캡슐, 글씨는 ‘오늘의 복습’과 같은 주아체 */
+let DV=LS.get('dv',"E1");
+function dateRow(t,st){ const d=parse(t), lab=`${d.getMonth()+1}월 ${d.getDate()}일 ${WD[d.getDay()]}요일`;
+  if(DV==='E1') return `<div class="dq e1">${I('cal')}<span class="t">${lab}</span><span class="chip hi">${I('flame')}${st}일째</span></div>`;
+  if(DV==='E2') return `<div class="dq e2"><span class="l">${I('cal')}<span class="t">${lab}</span></span><span class="r">${I('flame')}${st}일째</span></div>`;
+  return `<div class="dq e3"><span class="t">${lab}</span><i></i><em>${I('flame')}${st}일째</em></div>`; }
 function vToday(){
   const t=today(), Q=quizCards();
   const due=dueList().length, nToday=S.cards.filter(c=>c.date===t).length, st=streak(), grad=Q.filter(c=>c.lv>=7).length;
@@ -674,7 +694,7 @@ function vToday(){
   const dueD=new Set(S.logs.filter(l=>l.ko==='due').map(l=>l.date)), frD=new Set(S.logs.filter(l=>l.ko==='free').map(l=>l.date));
   const week=WD.map((w,i)=>{ const ds=addDays(ws,i); return `<span>${w}<i class="${dueD.has(ds)?'mk-d':''} ${frD.has(ds)?'mk-f':''} ${ds===t?'mk-t':''} ${ds>t?'mk-x':''}">${+ds.slice(8)}</i></span>`; }).join('');
   return `${demo}${notices()}<div class="home">
-  <div class="greet"><span class="d">${label(t)}</span><span class="chip hi">${I('flame')}${st}일째</span></div>
+  ${dateRow(t,st)}
   <div class="tl rev">
     <div class="rev-top"><div class="big-ring">${ringSvg(tot?doneT/tot:0)}<div><b>${due}</b><small>남은 카드</small></div></div>
       <div class="rev-r"><div class="pmrow">${I('stairs','st-ic')}<span class="t">오늘의 복습</span><span class="p"><b>P</b>ractice <b>M</b>akes <b>P</b>erfect!</span></div>
