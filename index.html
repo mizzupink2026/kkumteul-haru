@@ -174,7 +174,9 @@ main{flex:1;padding:4px 14px 20px}
 .stat3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .stat{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px;text-align:center}
 .stat b{display:block;font-size:20px}
-.stat span{font-size:11.5px;color:var(--sub)}
+.stat span{font-size:11px;color:var(--sub);white-space:nowrap;letter-spacing:-.2px;word-break:keep-all}
+.stat{padding:10px 4px;min-width:0}
+.stat3{gap:6px}
 .vote{margin:10px 0}
 .vote .l{display:flex;align-items:baseline;gap:6px;font-size:13px;margin-bottom:4px}
 .vote .l .i{font-family:"Gowun Batang",serif;flex:1}
@@ -186,10 +188,12 @@ main{flex:1;padding:4px 14px 20px}
 .hbar .tr{flex:1;height:10px;background:var(--line);border-radius:6px;overflow:hidden}
 .hbar .tr i{display:block;height:100%;border-radius:6px}
 .hbar .v{width:40px;text-align:right;color:var(--sub);font-size:12px}
-.grid7{width:100%;border-collapse:collapse;font-size:12.5px}
+.grid7{width:100%;border-collapse:collapse;font-size:12px;table-layout:fixed}
+.grid7 th:first-child,.grid7 td.nm{width:34%}
 .grid7 th{font-weight:400;color:var(--sub);font-size:11.5px;padding:4px 0}
-.grid7 td{padding:5px 2px;text-align:center}
-.grid7 td.nm{text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px}
+.grid7 td{padding:5px 1px;text-align:center}
+.grid7 .dot{width:14px;height:14px}
+.grid7 td.nm{text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:0}
 .dot{width:16px;height:16px;border-radius:50%;display:inline-block;background:#ede6da;vertical-align:middle}
 .dot.part{opacity:.45}
 .dot.na{background:none;border:1px dashed #e2dbd0}
@@ -560,6 +564,12 @@ header.top{padding-top:13px;padding-bottom:12px}
 .brand #brandIco{margin:-6px 6px -6px -4px}
 header.top .hset{background:color-mix(in srgb,var(--hdr-ink) 14%,transparent);border:0;color:var(--hdr-ink);width:36px;height:36px;padding:0;display:grid;place-items:center;border-radius:12px}
 header.top .hset .ic{width:19px;height:19px;vertical-align:0}
+.cheer{position:fixed;left:50%;top:46%;z-index:150;width:64px;height:64px;margin:-32px 0 0 -32px;border-radius:50%;background:var(--hi);color:var(--hi-on);display:grid;place-items:center;pointer-events:none;box-shadow:0 6px 18px rgba(0,0,0,.18);animation:cheer .9s cubic-bezier(.3,1.4,.5,1) forwards}
+.cheer .ic{width:32px;height:32px;stroke-width:2;vertical-align:0}
+.cheer.full{width:84px;height:84px;margin:-42px 0 0 -42px;animation-duration:1.3s}
+.cheer.full .ic{width:42px;height:42px}
+@keyframes cheer{0%{opacity:0;transform:scale(.4)}25%{opacity:1;transform:scale(1.05)}70%{opacity:1;transform:scale(1) translateY(-6px)}100%{opacity:0;transform:scale(.9) translateY(-18px)}}
+@media (prefers-reduced-motion:reduce){.cheer{animation-duration:.6s}}
 </style>
 </head>
 <body>
@@ -701,6 +711,7 @@ const P = {
   sliders:'<path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/>',
   target:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.2"/>',
   book:'<path d="M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2z"/><path d="M22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7z"/>',
+  thumb:'<path d="M7 10v12"/><path d="M15 5.9 14 10h5.8a2 2 0 0 1 1.9 2.6l-2.3 8a2 2 0 0 1-1.9 1.4H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.8a2 2 0 0 0 1.8-1.1L12 2a3.1 3.1 0 0 1 3 3.9z"/>',
   flame:'<path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.4-.5-2-1-3-1.1-2.1-.2-4.1 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.2.4-2.3 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>',
   quote:'<path d="M6 8h4v4c0 3-1.6 4.8-4 5.5M14 8h4v4c0 3-1.6 4.8-4 5.5"/>',
   note:'<path d="M15.5 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8.5z"/><path d="M15 3v6h6"/>',
@@ -1088,7 +1099,7 @@ function weekHtml(){
   return `<div class="datebar"><button class="iconbtn" data-act="sweek" data-n="-7">‹</button><div class="d">${label(dates[0]).replace(/ \(.+\)/,'')} – ${label(dates[6]).replace(/ \(.+\)/,'')}<small>${dates.includes(T)?'이번 주':''}</small></div><button class="iconbtn" data-act="sweek" data-n="7">›</button></div>
   <div class="grid2"><div>
   <div class="card"><h3>${I('flower')} 요일별 국화 <span class="muted" style="font-weight:400">· 누르면 그날로</span></h3><div class="garden">${garden}</div></div>
-  <div class="card stat3"><div class="stat"><b>${st.avg===null?'–':Math.round(st.avg*100)+'%'}</b><span>주간 평균</span></div><div class="stat"><b>${st.good}송이</b><span>활짝 핀 날(80%↑)</span></div><div class="stat"><b>${streak()}일</b><span>현재 연속</span></div></div>
+  <div class="card stat3"><div class="stat"><b>${st.avg===null?'–':Math.round(st.avg*100)+'%'}</b><span>주간 평균</span></div><div class="stat"><b>${st.good}송이</b><span>활짝 핀 날</span></div><div class="stat"><b>${streak()}일</b><span>현재 연속</span></div></div>
   <div class="insight">${insightText(st)}</div>
   ${voteCard(st.perCat,'이번 주, 되고 싶은 나에게 던진 표')}
   </div><div>
@@ -1169,7 +1180,7 @@ function delMemo(id){
   toast('메모를 지웠어요','되돌리기',()=>{ op({op:'upsert',table:'memos',row:m}); renderMemo(); });
 }
 
-const APP_VER='2026-11-12f';
+const APP_VER='2026-11-13a';
 
 /* ---------- 퀴즈 카드 백업(CSV) ---------- */
 async function cardsCsv(){
@@ -1234,8 +1245,7 @@ function setLog(id,value){
   render();
   if(it && before<1 && frac(d,it)>=1){
     const p=dayPct(d);
-    if(p!==null&&p>=0.999) toast('마지막 꽃잎까지! 오늘의 국화가 피었어요');
-    else { const c=catOf(it.catId); toast(`'${c.identity||c.name}'에게 한 표!`); }
+    cheerPop(p!==null&&p>=0.999);
   }
 }
 const findItem = id => itemsFor(ui.date).find(i=>i.id===id);
@@ -1366,6 +1376,11 @@ function setModal(){
   <div class="card setc"><h3>${I('save')} 백업</h3><div class="row" style="flex-wrap:wrap"><button class="btn" data-act="copyJson">전체 데이터 복사(JSON)</button><button class="btn" data-act="cardsCsv">퀴즈 카드 내려받기(CSV)</button></div>
     <p class="muted" style="line-height:1.6;margin:8px 0 0;font-size:13px">퀴즈 카드는 구글 시트 <b>cards</b> 탭에 그대로 있어요(꿈틀나비 Q&amp;A 앱이 함께 씀). 이 버튼은 시트의 카드와 이 기기에 남아 있던 카드를 합쳐 파일로 내려받아요.</p></div>
 `);
+}
+/* 완료 칭찬: 엄지척 아이콘이 가운데에서 톡 떠올랐다 사라짐 (하루를 다 채우면 조금 더 크게) */
+function cheerPop(full){
+  const el=document.createElement('div'); el.className='cheer'+(full?' full':''); el.innerHTML=I('thumb'); document.body.appendChild(el);
+  setTimeout(()=>el.remove(),full?1300:900);
 }
 function scrollTop(){ cancelAnimationFrame(keepRAF); clearTimeout(keepT); const f=document.getElementById('frame'); if(document.body.classList.contains('mobile')) f.scrollTop=0; else window.scrollTo(0,0); }
 

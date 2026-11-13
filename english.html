@@ -387,6 +387,13 @@ nav.tabs button.on{color:var(--pri);background:var(--pri-soft)}
 #splash .st{animation:none;opacity:0;transform:translateY(8px);margin-top:4px}
 #splash .st b{color:var(--ink)}
 #splash .st span{color:var(--hi-ink)}
+.exko{color:var(--ink)!important;font-weight:600}
+.exen{position:relative;margin-top:6px;padding:7px 10px;border-radius:10px;background:var(--card);font-size:14px;line-height:1.45;cursor:pointer}
+.exen .en{color:var(--pri);font-weight:700;filter:blur(5px);transition:filter .2s}
+.exen .say{visibility:hidden}
+.exen small{position:absolute;inset:0;display:grid;place-items:center;font-size:12px;color:var(--sub);font-weight:400}
+.exen.show .en{filter:none}.exen.show .say{visibility:visible}.exen.show small{display:none}
+.lab span:last-child{word-break:keep-all}
 </style>
 </head>
 <body>
@@ -410,7 +417,7 @@ nav.tabs button.on{color:var(--pri);background:var(--pri-soft)}
    데이터: '꿈틀나비 하루 DB' 시트의 cards 탭 (하루 앱과 같은 서버)
    서버 연결 정보(kn2_cfg)는 하루 앱과 함께 씀
    ========================================================= */
-const APP_VER='en-2026-11-12c';
+const APP_VER='en-2026-11-13a';
 const LS = { get(k,d,p='ke1_'){try{const v=localStorage.getItem(p+k);return v?JSON.parse(v):d}catch(e){return d}},
              set(k,v,p='ke1_'){try{localStorage.setItem(p+k,JSON.stringify(v))}catch(e){}} };
 let cfg = LS.get('cfg',{api:'',key:''},'kn2_');
@@ -692,7 +699,7 @@ function vToday(){
   const demo = DEMO() ? `<div class="insight">지금은 <b>체험 모드</b>예요. 설정에서 서버(구글 시트)를 연결하면 꿈틀나비 하루에서 모은 표현이 그대로 보여요.</div>` : '';
   const abM=S.cards.filter(c=>c.type==='read'&&String(c.date).slice(0,7)===t.slice(0,7));
   const abBadge=abM.length?`<i class="lbadge" title="이번 달 읽은 칼럼">${abM.length}편</i>`:'';
-  const labels=Object.entries(LABELS).map(([k,v])=>`<button class="lab" style="--cc:var(${LCOL[k]||'--c1'})" data-act="goLabel" data-v="${k}">${k==='abby'?abBadge:''}<span class="bd">${I(v.i)}</span><span>${v.n}</span></button>`).join('');
+  const labels=Object.entries(LABELS).map(([k,v])=>`<button class="lab" style="--cc:var(${LCOL[k]||'--c1'})" data-act="goLabel" data-v="${k}">${k==='abby'?abBadge:''}<span class="bd">${I(v.i)}</span><span>${labNm(v.n)}</span></button>`).join('');
   const ws=addDays(t,-parse(t).getDay()), ym=t.slice(0,7);
   const ML=S.logs.filter(l=>String(l.date).slice(0,7)===ym), dueN=new Set(ML.filter(l=>l.ko==='due').map(l=>l.date)).size, frN=ML.filter(l=>l.ko==='free').reduce((a,l)=>a+l.lv,0);
   const dueD=new Set(S.logs.filter(l=>l.ko==='due').map(l=>l.date)), frD=new Set(S.logs.filter(l=>l.ko==='free').map(l=>l.date));
@@ -825,6 +832,11 @@ const isEx=t=>(String(t||'').match(/[A-Za-z]+/g)||[]).length>=3;   // 영어 단
 const starOf=t=>{ const m=String(t||'').match(/(\d(?:\.\d)?)\s*\/\s*5/); if(m) return +m[1]; const k=(String(t||'').match(/★[★☆]*/)||[''])[0]; return k?(k.match(/★/g)||[]).length:0; };
 const starTag=t=>{ const n=starOf(t); return n?`<span class="tag" style="background:var(--hi-soft);color:var(--hi-ink)">${'★'.repeat(Math.round(n))}${'☆'.repeat(5-Math.round(n))}</span>`:''; };
 const exEn=t=>String(t||'').replace(/\s*[(（][^()（）]*[)）]\s*$/,'').trim();
+/* 퀴즈 정답 아래 예문: '영어 (우리말)'을 나눠 우리말을 먼저, 영어는 아래 따로 가려 두고 누르면 보이게 */
+function quizEx(c){ const m=String(c.note||'').match(/^(.*?)\s*[(（]([^()（）]*)[)）]\s*$/), en=m?m[1].trim():String(c.note||'').trim(), ko=m?m[2].trim():'';
+  if(!ko) return exLine(c,'note exq');
+  return `<div class="note exq exko">${I('bubble')} ${esc(ko)}</div><div class="exen" data-act="exReveal" role="button" tabindex="0"><span class="en">${esc(en)}</span> ${sayBtn(en)}<small>눌러서 영어 보기</small></div>`; }
+const labNm=n=>n==='통찰 한 스푼'?'통찰<br>한 스푼':esc(n);
 const exLine=(c,cls)=>`<div class="${cls||'exs'}">${I('bubble')} <span class="en">${esc(c.note)}</span> ${sayBtn(exEn(c.note))}</div>`;
 const EX_FMT='예문(그 표현을 쓴 자연스러운 영어 문장 한 개, 뒤에 괄호로 우리말 뜻)';
 const block=(fmt,extra)=>`\n\n---\n마지막에는 내 영어 학습 앱에 붙여넣을 '앱용 블록'을 코드 블록 하나로 만들어 줘.\n- 한 줄에 카드 하나, 칸은 ' :: '로 구분, 꼭 기억할 핵심만 최대 3줄\n- 형식: ${fmt}\n${extra||''}\n- 뇌·찰떡 줄에는 단어나 어구만 두지 말고 그 표현을 실제로 쓴 예문을 꼭 넣어 줘\n- 이어지는 대화에서 내용을 고치거나 더하게 되면, 그때마다 답 맨 끝에 바뀐 줄만이 아니라 앱용 블록 전체를 처음부터 끝까지 다시 보여 줘 (휴대폰에서 한 번에 복사하려고 해)`;
@@ -888,7 +900,7 @@ const askURL=t=>'https://claude.ai/new?q='+encodeURIComponent(t);
 function abStat(){ const m=S.cards.filter(c=>c.type==='read'&&String(c.date).slice(0,7)===today().slice(0,7)); if(!m.length) return ''; const r=m.map(c=>starOf(c.note)).filter(Boolean); return `이번 달 ${m.length}편 읽음`+(r.length?` · 평균 ★ ${(r.reduce((a,b)=>a+b,0)/r.length).toFixed(1)}`:''); }
 function vLearn(){
   const L=LABELS[M.lb]||LABELS.fit;
-  const chips=Object.entries(LABELS).map(([k,v])=>`<button class="${M.lb===k?'on':''}" style="--cc:var(${LCOL[k]})" data-act="lb" data-v="${k}"><span>${I(v.i)}</span>${v.n}</button>`).join('');
+  const chips=Object.entries(LABELS).map(([k,v])=>`<button class="${M.lb===k?'on':''}" style="--cc:var(${LCOL[k]})" data-act="lb" data-v="${k}"><span>${I(v.i)}</span>${labNm(v.n)}</button>`).join('');
   const q=M.lq.trim();
   const fitPre = M.lb==='fit' ? `<button class="btn" data-act="fitPre" ${q?'':'disabled'}>앱에서 바로 보기</button>` : '';
   return `<div class="card learn"><div class="labels">${chips}</div>
@@ -1104,7 +1116,7 @@ function qzPlayHtml(Z){
   const head=`<div class="row" style="font-size:13px;color:var(--muted)"><span class="grow">${R.srs?'':''}${Math.min(R.i+1,R.queue.length)} / ${R.queue.length}${R.queue.length>R.total?' (다시 보는 문제 포함)':''}</span><a href="#" data-act="qzQuit">그만하기</a></div><div class="prog"><i style="width:${n/R.total*100}%"></i></div>`;
   const tag=`<div>${tyTag(ty)}${ty==='culture'?culTag(c.scene):''}${catTag(c.cat)}</div>`;
   const nt = ty==='culture' ? culParts(c).tip : c.note;
-  const extra=`${nt?(EXT(ty)&&isEx(nt)?exLine(c,'note exq'):`<div class="note">${esc(nt)}</div>`):''}${c.scene&&ty!=='fit'&&ty!=='culture'?`<div class="note">${esc(c.scene)}</div>`:''}${c.src?`<div class="note">${I('tag')} ${esc(srcTxt(c.src))}</div>`:''}${c.yg?`<div style="margin-top:6px">${ygLink(c.en)}</div>`:''}`;
+  const extra=`${nt?(EXT(ty)&&isEx(nt)?quizEx(c):`<div class="note">${esc(nt)}</div>`):''}${c.scene&&ty!=='fit'&&ty!=='culture'?`<div class="note">${esc(c.scene)}</div>`:''}${c.src?`<div class="note">${I('tag')} ${esc(srcTxt(c.src))}</div>`:''}${c.yg?`<div style="margin-top:6px">${ygLink(c.en)}</div>`:''}`;
   const rateBtns = `<div class="rate"><button class="btn bad" data-act="rate" data-v="0">몰랐음</button><button class="btn mid" data-act="rate" data-v="1">헷갈림</button><button class="btn good" data-act="rate" data-v="2">알았음</button></div><button class="grad" data-act="rate" data-v="3">이건 완전히 알아요 → 졸업</button>`;
   if(ty==='scale'){
     const list=scaleOpts(c);
@@ -1314,6 +1326,7 @@ document.addEventListener('click',e=>{
     case 'qzCnt': M.qz.cnt=+el.dataset.v; render(); break;
     case 'qzDir': M.qz.dir=el.dataset.v; render(); break;
     case 'qzStart': qzStart(); render(); break;
+    case 'exReveal': el.classList.add('show'); break;
     case 'qzFlip': M.qz.run.show=true; render(); break;
     case 'rate': qzAnswer(+el.dataset.v); render(); break;
     case 'qzPick': { const R=M.qz.run, c=qzCur(), k=+el.dataset.k; R.pick=k; const right=R.opts.list[k]===c.en;
