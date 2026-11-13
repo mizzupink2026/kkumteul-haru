@@ -394,6 +394,24 @@ nav.tabs button.on{color:var(--pri);background:var(--pri-soft)}
 .exen small{position:absolute;inset:0;display:grid;place-items:center;font-size:12px;color:var(--sub);font-weight:400}
 .exen.show .en{filter:none}.exen.show .say{visibility:visible}.exen.show small{display:none}
 .lab span:last-child{word-break:keep-all}
+.lrow{flex-wrap:wrap;gap:6px}
+.lrow .btn{white-space:nowrap}
+.xbtn{padding:8px 10px!important;display:inline-flex;align-items:center}
+.xbtn .ic{width:16px;height:16px}
+.guide2{font-size:12px;margin-top:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.scnt{font-size:12px;color:var(--sub);margin-top:4px;text-align:right}
+.scnt .over{color:var(--hi-ink);font-weight:700}
+mark.err{background:none;color:inherit;text-decoration:underline wavy var(--hi);text-decoration-thickness:1.5px;text-underline-offset:3px;font-weight:700}
+.rkeys{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;margin-top:6px;font-size:12.5px}
+.rkeys .ic{width:14px;height:14px;color:var(--pri)}
+.rkeys span{background:var(--bg);border-radius:8px;padding:1px 7px}
+.rkeys s{color:var(--sub)}
+.rkeys b{color:var(--pri)}
+.qwrap{position:relative;flex:1;min-width:0;display:block}
+.qwrap .inp{padding-right:34px}
+.qx{position:absolute;right:4px;top:50%;transform:translateY(-50%);border:0;background:var(--track);width:24px;height:24px;border-radius:50%;display:grid;place-items:center;color:var(--sub);padding:0}
+.qx .ic{width:13px;height:13px;vertical-align:0}
+.qwrap .inp:placeholder-shown+.qx{display:none}
 </style>
 </head>
 <body>
@@ -417,7 +435,7 @@ nav.tabs button.on{color:var(--pri);background:var(--pri-soft)}
    데이터: '꿈틀나비 하루 DB' 시트의 cards 탭 (하루 앱과 같은 서버)
    서버 연결 정보(kn2_cfg)는 하루 앱과 함께 씀
    ========================================================= */
-const APP_VER='en-2026-11-13a';
+const APP_VER='en-2026-11-13c';
 const LS = { get(k,d,p='ke1_'){try{const v=localStorage.getItem(p+k);return v?JSON.parse(v):d}catch(e){return d}},
              set(k,v,p='ke1_'){try{localStorage.setItem(p+k,JSON.stringify(v))}catch(e){}} };
 let cfg = LS.get('cfg',{api:'',key:''},'kn2_');
@@ -655,7 +673,7 @@ function render(){
 }
 function fitPhrase(){ const row=document.querySelector('.pmrow'), p=row&&row.querySelector('.p'); if(!p) return;
   let fs=14.5; p.style.fontSize=fs+'px'; while(row.scrollWidth>row.clientWidth && fs>9.5){ fs-=.25; p.style.fontSize=fs+'px'; } fs-=.5; p.style.fontSize=fs+'px'; }
-function go(tab){ if(M.sheet) closeModal(); M.tab=tab; LS.set('tab',tab); render(); window.scrollTo(0,0); }
+function go(tab){ if(M.sheet) closeModal(); if(tab==='store'&&M.tab!=='store'){ M.st.q=''; M.st.cat=''; } M.tab=tab; LS.set('tab',tab); render(); window.scrollTo(0,0); }
 
 /* ---------- 오늘 ---------- */
 function streak(){
@@ -857,10 +875,10 @@ const LABELS = {
     ph:"예) I'm so boring today.", quiz:true,
     p:q=>`내가 쓴 영어 문장이 자연스러운지 봐 줘.\n\n${q}\n\n1) 판정(자연스러움 / 어색함 / 틀림)\n2) 고친 문장 — '꼭 고칠 것'과 '더 자연스럽게 하려면'을 나눠서\n3) 왜 그런지 원어민 감각으로\n4) 한국어 영향으로 생긴 실수라면 그 한·영 차이`
       +block('나침반 :: 내 원래 문장 :: 고친 문장 :: 이유 한 줄 :: 분류','- 이미 자연스러운 문장이면 블록은 비워도 돼\n- '+CAT_RULE)},
-  abby:{i:'mail',e:'',n:'Dear Abby',hint:'편지만 읽고 요약 + 내 생각 한두 문장',out:'요약은 읽기 노트로, 표현은 퀴즈 카드로',
+  abby:{i:'mail',e:'',n:'Dear Abby',hint:'편지만 읽고 요약 + 내 생각 (최대 6문장)',out:'요약은 읽기 노트로, 표현은 퀴즈 카드로',
     ph:"제목: Neighbor's Unruly Granddaughter Skates on Thin Ice\n편지 요약: A woman is upset because her neighbor's granddaughter ...\n내 생각: I think she should ...", quiz:true, link:['오늘의 칼럼 열기','https://www.uexpress.com/life/dearabby'],
-    p:q=>`Dear Abby 칼럼에서 독자의 편지만 읽고(Abby의 답장은 아직 안 읽었어) 영어로 요약하고, 내 생각을 한두 문장 붙여 봤어. 날카로운 원어민 튜터의 눈으로 봐 줘.\n\n${q}\n\n(칼럼 링크나 편지 본문은 여기에 붙일게: )\n\n1) 총평 — 내 글(요약 + 생각) 전체에 별점(★ 5개 만점)을 주고, 잘된 점과 부족한 점을 각각 한두 줄로. 칭찬만 하지 말고 냉정하게\n2) 편지 요약 첨삭 — 편지 내용만 기준으로, '꼭 고칠 것'과 '더 자연스럽게 하려면'을 나눠서 짧게\n3) 내 생각 첨삭 — 내 의견이 자연스러운 영어로 전달되는지만 짧게 다듬어 줘 (내 의견이 맞는지 평가하거나 Abby의 답과 비교하지는 마)\n4) 모범 요약 예시 — 원어민이 같은 분량(2~3문장)으로 쓸 법한 편지 요약 하나. 그 아래 내 요약과 비교해 눈여겨볼 점(구조·핵심 고르기·표현) 한두 개만 짧게. 편지 본문을 못 읽었으면 내 요약에 나온 내용 안에서만 쓰고, 없는 내용을 지어내지 말아 줘\n5) 유용한 표현 4~5개 — 편지·답장 구분 없이 칼럼 전체에서 활용도가 높거나 원어민다운 표현을 골라 줘. 우리말 뜻과 함께, 표현마다 어디서 나왔는지(편지/Abby)만 짧게 표시. Abby 답장에 조언·완곡 표현으로 눈여겨볼 게 있으면 따로 한 줄로 짚어 줘\n6) 한·영 차이 포인트 한두 개\n7) 마지막에 '퀴즈 낼까?'라고만 물어봐 줘. 내가 그러자고 하면 오늘 표현으로 응용 퀴즈 3문제를 한 번에 하나씩 내고, 채점 피드백은 짧게`
-      +block('독해 :: 칼럼 제목 :: 처음 쓴 내 글 :: 고친 내 글 :: 모범 요약 :: 핵심 고민 한 줄 :: 별점(예: ★★★★☆ 4/5)','- 첫 줄은 독해 한 줄(이 줄만 핵심 3줄 제한에서 빼고, 글 셋은 줄바꿈 없이 한 줄로). \'내 글\'은 편지 요약과 내 생각을 이어 붙인 것. 처음 쓴 내 글은 내가 쓴 그대로 한 글자도 고치지 말고 옮겨 줘\n- 그 아래로 5)에서 고른 유용한 표현을 이 형식으로 최대 5줄(편지·답장 구분 없이 가장 쓸모 있는 순서로): 찰떡 :: 우리말 :: 영어 :: '+EX_FMT+' :: 쓰임 장면 :: 분류\n- '+CAT_RULE+'\n- '+YG_RULE)},
+    p:q=>`Dear Abby 칼럼에서 독자의 편지만 읽고(Abby의 답장은 아직 안 읽었어) 영어로 요약하고 내 생각을 붙여 봤어(요약 + 생각 합쳐 최대 6문장). 날카로운 원어민 튜터의 눈으로 봐 줘.\n\n${q}\n\n(칼럼 링크나 편지 본문은 여기에 붙일게: )\n\n1) 총평 — 내 글(요약 + 생각) 전체에 별점(★ 5개 만점)을 주고, 잘된 점과 부족한 점을 각각 한두 줄로. 칭찬만 하지 말고 냉정하게. 6문장을 넘었으면 어디를 줄이면 좋을지도 한 줄로\n2) 편지 요약 첨삭 — 편지 내용만 기준으로, '꼭 고칠 것'과 '더 자연스럽게 하려면'을 나눠서 짧게\n3) 내 생각 첨삭 — 내 의견이 자연스러운 영어로 전달되는지만 짧게 다듬어 줘 (내 의견이 맞는지 평가하거나 Abby의 답과 비교하지는 마)\n4) 모범 요약 예시 — 원어민이 같은 분량(2~3문장)으로 쓸 법한 편지 요약 하나. 그 아래 내 요약과 비교해 눈여겨볼 점(구조·핵심 고르기·표현) 한두 개만 짧게. 편지 본문을 못 읽었으면 내 요약에 나온 내용 안에서만 쓰고, 없는 내용을 지어내지 말아 줘\n5) 유용한 표현 4~5개 — 편지·답장 구분 없이 칼럼 전체에서 활용도가 높거나 원어민다운 표현을 골라 줘. 우리말 뜻과 함께, 표현마다 어디서 나왔는지(편지/Abby)만 짧게 표시. Abby 답장에서 고른 표현은 그 표현이 들어간 Abby의 문장을 처음부터 끝까지 그대로 함께 보여 줘(우리말 뜻과 함께). Abby의 조언·완곡 표현으로 눈여겨볼 문장이 있으면 그 문장 전체를 따로 짚어 줘\n6) 한·영 차이 포인트 한두 개\n7) 마지막에 '퀴즈 낼까?'라고만 물어봐 줘. 내가 그러자고 하면 오늘 표현으로 응용 퀴즈 3문제를 한 번에 하나씩 내고, 채점 피드백은 짧게`
+      +block('독해 :: 칼럼 제목 :: 처음 쓴 내 글 :: 고친 내 글 :: 모범 요약 :: 핵심 고민 한 줄 :: 별점(예: ★★★★☆ 4/5)','- 첫 줄은 독해 한 줄(이 줄만 핵심 3줄 제한에서 빼고, 글 셋은 줄바꿈 없이 한 줄로). \'내 글\'은 편지 요약과 내 생각을 이어 붙인 것. 처음 쓴 내 글은 내가 쓴 그대로 한 글자도 고치지 말고 옮기되, 꼭 고쳐야 했던 부분(부정확하거나 부자연스러운 곳)만 [[ ]]로 감싸 줘. 예: I was [[surprised of]] the news.\n- 그 아래로 5)에서 고른 유용한 표현을 이 형식으로 최대 5줄(편지·답장 구분 없이 가장 쓸모 있는 순서로): 찰떡 :: 우리말 :: 영어 :: '+EX_FMT+' :: 쓰임 장면 :: 분류. Abby 답장에서 고른 표현은 예문 칸에 Abby의 문장 전체를 그대로 넣어 줘\n- 그 아래로 내 글에서 가장 중요하고 꼭 고쳐야 할 실수만 1~3개(사소한 건 빼고): 나침반 :: 내가 쓴 표현(짧은 어구) :: 고친 표현 :: 이유 한 줄 :: 분류 (이 줄들은 핵심 3줄 제한과 별개)\n- '+CAT_RULE+'\n- '+YG_RULE)},
   culture:{i:'globe',e:'',n:'Hi from Korea',hint:'한국 문화를 영어로 소개해요',out:'퀴즈: 한 문장 소개 · 외국인 질문에 답하기',
     ph:'예) 추석, 눈치, 나이 묻는 문화', quiz:true,
     cats:true,
@@ -896,6 +914,15 @@ function cultureBox(){
   return `${cats}${cnt}<button class="bagbtn" data-act="bag">주제 주머니 ${M.bag?'접기 ▴':`열기 ▾`}</button>${bag}`;
 }
 const LCOL={scale:'--c1',brain:'--c2',fit:'--c3',compass:'--c5',abby:'--c6',culture:'--c1',red:'--c4',insight:'--c2'};
+const ABBY_STRUCT=`Dear Abby 칼럼의 독자 편지를 읽고, 편지 요약과 내 생각을 합쳐 영어로 최대 6문장을 쓰려고 해. 내 글을 대신 써 주지는 말고, 글의 구조만 화살표로 짧게 제안해 줘.
+- 예: 누가·어떤 상황 → 무엇이 문제 → 무엇을 묻는지 → 내 생각(한두 문장)
+- 칸마다 몇 문장이 알맞은지(합계 6문장 이하)와, 칸마다 쓰면 좋을 연결어 하나씩만 덧붙여 줘
+- 편지 내용은 요약하지 말아 줘(내가 직접 쓸 거야)
+
+(편지 링크나 본문은 여기에 붙일게: )`;
+function sentInfo(t){ const body=String(t||'').split('\n').filter(l=>!/^\s*제목\s*[:：]/.test(l)).join(' ').replace(/^\s*(편지 요약|내 생각)\s*[:：]/gm,'');
+  const n=(body.match(/[^.!?。]+[.!?。]+/g)||[]).length + (/[^.!?。\s]\s*$/.test(body.trim())&&body.trim()?1:0);
+  return `<span class="${n>6?'over':''}">문장 ${n} / 6</span>${n>6?' · 6문장 안으로 줄여 볼까요?':''}`; }
 const askURL=t=>'https://claude.ai/new?q='+encodeURIComponent(t);
 function abStat(){ const m=S.cards.filter(c=>c.type==='read'&&String(c.date).slice(0,7)===today().slice(0,7)); if(!m.length) return ''; const r=m.map(c=>starOf(c.note)).filter(Boolean); return `이번 달 ${m.length}편 읽음`+(r.length?` · 평균 ★ ${(r.reduce((a,b)=>a+b,0)/r.length).toFixed(1)}`:''); }
 function vLearn(){
@@ -908,9 +935,9 @@ function vLearn(){
     ${L.cats?cultureBox():''}
     ${L.link?`<a class="askc" style="margin:0 0 10px" href="${L.link[1]}" target="_blank" rel="noopener"><span>${I('mail')}</span><span><b>${L.link[0]}</b><span class="sub">${abStat()||'공식 칼럼 사이트에서 읽기 · 지난 칼럼은 Archives'}</span></span><span class="go">›</span></a>`:''}
     <textarea id="lq" rows="${M.lb==='red'||M.lb==='abby'?6:3}" placeholder="${esc(L.cats&&M.cu?CUL_PH[M.cu]:L.ph)}">${esc(M.lq)}</textarea>
-    <div class="row" style="margin-top:8px;justify-content:flex-end"><button class="btn ghost" data-act="lqClear" ${q?'':'disabled'} style="margin-right:auto">✕ 지우기</button>${fitPre}<a class="btn pri" style="text-decoration:none;${q?'':'opacity:.45;pointer-events:none'}" id="askGo" href="${q?askURL(L.p(q)):'#'}" target="_blank" rel="noopener">Claude에게 묻기</a></div>
+    ${M.lb==='abby'?`<div class="scnt" id="scnt">${sentInfo(M.lq)}</div>`:''}<div class="row lrow" style="margin-top:8px;justify-content:flex-end"><button class="btn ghost xbtn" data-act="lqClear" ${q?'':'disabled'} style="margin-right:auto" aria-label="지우기" title="지우기">${I('x')}</button>${fitPre}${M.lb==='abby'?`<a class="btn" style="text-decoration:none" href="${askURL(ABBY_STRUCT)}" target="_blank" rel="noopener">구조 먼저</a>`:''}<a class="btn pri" style="text-decoration:none;${q?'':'opacity:.45;pointer-events:none'}" id="askGo" href="${q?askURL(L.p(q)):'#'}" target="_blank" rel="noopener">Claude에게 묻기</a></div>
     ${M.lb==='fit'&&M.ltr?`<div class="res">${M.ltr}${learnCardBox()}</div>`:''}
-    <div class="muted" style="font-size:12px;margin-top:10px">Claude 답 끝의 <b>앱용 블록</b>을 아래에 붙여넣어 담아요.</div></div>
+    <div class="muted guide2">Claude 답 끝의 <b>앱용 블록</b>을 아래에 붙여넣어요</div></div>
   ${pasteCard()}`;
 }
 async function fitPreview(){
@@ -1200,7 +1227,7 @@ function vStore(){
   if(T.view==='set') return `${top}${seg}${setView()}${weakMap()}`;
   const cuChips = T.ty==='culture' ? `<div class="chips2" style="margin-top:-4px"><button class="${!T.cu?'on':''}" data-act="stCu" data-v="">모든 분야</button>${CUL.map(([k,e,n])=>{ const c=S.cards.filter(x=>x.type==='culture'&&x.scene===k).length; return c?`<button class="${T.cu===k?'on':''}" data-act="stCu" data-v="${k}">${I(e)} ${n} ${c}</button>`:''; }).join('')}</div>` : '';
   return `${top}${seg}<div class="card"><div class="chips2">${chips}</div>${cuChips}
-    <div class="selrow"><input class="inp" id="stQ" value="${esc(T.q)}" placeholder="찾기" autocomplete="off" autocapitalize="off">${cats.length?`<select id="stCat"><option value="">모든 분류</option>${cats.map(c=>`<option ${T.cat===c?'selected':''}>${esc(c)}</option>`).join('')}</select>`:''}</div>
+    <div class="selrow"><span class="qwrap"><input class="inp" id="stQ" value="${esc(T.q)}" placeholder="찾기" autocomplete="off" autocapitalize="off"><button class="qx" data-act="stQClear" aria-label="검색어 지우기" title="검색어 지우기">${I('x')}</button></span>${cats.length?`<select id="stCat"><option value="">모든 분류</option>${cats.map(c=>`<option ${T.cat===c?'selected':''}>${esc(c)}</option>`).join('')}</select>`:''}</div>
     <div style="margin-top:10px">${rows||`<div class="muted" style="padding:12px 0;font-size:13.5px">아직 담긴 것이 없어요.</div>`}</div></div>${weakMap()}`;
 }
 function setView(){
@@ -1217,10 +1244,13 @@ function setView(){
         ${shelf?'':`<button class="btn big-btn" style="margin-top:10px" data-act="setPractice" data-v="${key}">이 서랍 복습하기</button>`}</details>`; }).reverse().join('');
     return `<details class="card cab" data-ty="${ty}" ${gOpen?'open':''}><summary><div class="row"><span style="color:var(--pri);display:flex">${I(TYPES[ty].i)}</span><b class="grow">${TYPES[ty].n}</b><span class="muted" style="font-size:12.5px">${n}장 · 서랍 ${D.length}개</span></div><div class="dms">${mini}</div></summary>${ty==='culture'?`<div class="chips2" style="margin:10px 0 0">${CUL.map(([k,e,n])=>{ const c=D.flat().filter(x=>x.scene===k).length; return c?`<button data-act="stCuGo" data-v="${k}">${I(e)} ${n} ${c}</button>`:''; }).join('')}</div>`:''}<div style="margin-top:10px">${drawers}</div></details>`; }).join('');
 }
-function readSteps(c){   // 읽기 노트: 처음 쓴 것 → 고친 것 → 모범 요약
-  if(!c.scene&&!c.opts) return '';
-  const st=(t,v,bg)=>v?`<div style="background:${bg};border-radius:10px;padding:8px 10px;margin-top:6px"><b style="font-size:12px">${t}</b><div class="en" style="font-size:13.5px;line-height:1.55;margin-top:2px">${esc(v)}</div></div>`:'';
-  return `<details style="margin-top:6px"><summary class="scene" style="cursor:pointer">세 단계로 비교해 보기</summary>${st('처음 쓴 내 글 (요약 + 내 생각)',c.scene,'#F4F1EA')}${st('고친 내 글',c.en,'#EAF6EC')}${st('모범 요약 (편지)',c.opts,'#EEF4FA')}</details>`;
+const markErr=t=>esc(t).replace(/\[\[(.+?)\]\]/g,'<mark class="err">$1</mark>');
+function readKeys(c){ const src='📰 Dear Abby · '+c.ko, L=S.cards.filter(x=>x.type==='compass'&&x.src===src).slice(0,3); if(!L.length) return '';
+  return `<div class="rkeys">${I('compass')}${L.map(x=>`<span><s>${esc(x.ko)}</s> → <b>${esc(x.en)}</b></span>`).join('')}</div>`; }
+function readSteps(c){   // 읽기 노트: 처음 쓴 것(고칠 곳 표시) → 고친 것 → 모범 요약
+  if(!c.scene&&!c.opts) return readKeys(c);
+  const st=(t,v,bg)=>v?`<div style="background:${bg};border-radius:10px;padding:8px 10px;margin-top:6px"><b style="font-size:12px">${t}</b><div class="en" style="font-size:13.5px;line-height:1.55;margin-top:2px">${markErr(v)}</div></div>`:'';
+  return `${readKeys(c)}<details style="margin-top:6px"><summary class="scene" style="cursor:pointer">세 단계로 비교해 보기</summary>${st('처음 쓴 내 글 (요약 + 내 생각)',c.scene,'#F4F1EA')}${st('고친 내 글',c.en,'#EAF6EC')}${st('모범 요약 (편지)',c.opts,'#EEF4FA')}</details>`;
 }
 function storeRow(c,h,q,extra){
   const ty=tyOf(c), shelf=SHELF(ty);
@@ -1340,6 +1370,7 @@ document.addEventListener('click',e=>{
     case 'homeList': openSheet(el.dataset.v); if(el.dataset.v==='dict') setTimeout(()=>document.getElementById('dq')?.focus(),80); break;
     case 'tt': M.tot=+el.dataset.v; drawSheet(); break;
     case 'voiceTest': { const v=document.getElementById('voiceSel'); setVoice(v?v.value:''); say('Hi! This is how I sound. What a relief!', el); } break;
+    case 'stQClear': M.st.q=''; render(); setTimeout(()=>document.getElementById('stQ')?.focus(),50); break;
     case 'stTy': M.st.ty=el.dataset.v; M.st.cu=''; render(); break;
     case 'stView': M.st.view=el.dataset.v; render(); break;
     case 'stCu': M.st.cu=el.dataset.v; render(); break;
@@ -1381,6 +1412,7 @@ document.addEventListener('input',e=>{
   if(e.target.id==='dq') M.dq=e.target.value;
   if(e.target.id==='lq'){ M.lq=e.target.value; const L=LABELS[M.lb], a=document.getElementById('askGo'), q=M.lq.trim();
     if(a){ a.href=q?askURL(L.p(q)):'#'; a.style.opacity=q?'':'.45'; a.style.pointerEvents=q?'':'none'; }
+    const sc=document.getElementById('scnt'); if(sc) sc.innerHTML=sentInfo(M.lq);
     const fp=document.querySelector('[data-act=fitPre]'); if(fp) fp.disabled=!q; const cl=document.querySelector('[data-act=lqClear]'); if(cl) cl.disabled=!q; }
   if(e.target.id==='pasteTx') M.paste.tx=e.target.value;
 });
