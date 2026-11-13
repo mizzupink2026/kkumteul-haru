@@ -413,6 +413,7 @@ mark.err{background:none;color:inherit;text-decoration:underline wavy var(--hi);
 .qx .ic{width:13px;height:13px;vertical-align:0}
 .qwrap .inp:placeholder-shown+.qx{display:none}
 .seg button .ic{width:15px;height:15px;vertical-align:-.2em}
+.guide b,.guide span,.cap p,.muted,.hint,.lead{text-wrap:balance;word-break:keep-all}
 </style>
 </head>
 <body>
@@ -436,7 +437,7 @@ mark.err{background:none;color:inherit;text-decoration:underline wavy var(--hi);
    데이터: '꿈틀나비 하루 DB' 시트의 cards 탭 (하루 앱과 같은 서버)
    서버 연결 정보(kn2_cfg)는 하루 앱과 함께 씀
    ========================================================= */
-const APP_VER='en-2026-11-14c';
+const APP_VER='en-2026-11-14d';
 const LS = { get(k,d,p='ke1_'){try{const v=localStorage.getItem(p+k);return v?JSON.parse(v):d}catch(e){return d}},
              set(k,v,p='ke1_'){try{localStorage.setItem(p+k,JSON.stringify(v))}catch(e){}} };
 let cfg = LS.get('cfg',{api:'',key:''},'kn2_');
@@ -507,7 +508,7 @@ const P = {
   tag:'<path d="M12.6 2.6A2 2 0 0 0 11.2 2H4a2 2 0 0 0-2 2v7.2a2 2 0 0 0 .6 1.4l8.7 8.7a2.4 2.4 0 0 0 3.4 0l6.6-6.6a2.4 2.4 0 0 0 0-3.4z"/><circle cx="7.5" cy="7.5" r="1.3"/>',
   youtube:'<rect x="2" y="5" width="20" height="14" rx="4"/><path d="m10 9 5 3-5 3z"/>',
 };
-P.board='<rect x="2.5" y="3.5" width="19" height="13" rx="1.5"/><path d="M8 21l4-4.5 4 4.5M6.5 8h7M6.5 11.5h4.5"/>';
+P.board='<path d="M3 21h18"/><path d="M5 21V10l7-5 7 5v11"/><path d="M10 21v-4.5a2 2 0 0 1 4 0V21"/><circle cx="12" cy="10.5" r="1.6"/><path d="M12 5V2.5h3"/>';
 const I=(k,cls='')=>P[k]?`<svg class="ic ${cls}" viewBox="0 0 24 24" aria-hidden="true">${P[k]}</svg>`:'';
 
 /* ---------- 도우미 ---------- */
@@ -887,7 +888,7 @@ const LABELS = {
     cats:true,
     p:q=>`한국 문화를 외국인 친구에게 영어로 소개하고 싶어. 주제: ${q}${M.cu?` (분야: ${(CUL.find(x=>x[0]===M.cu)||[])[2]})`:''}\n${M.cu==='travel'?'0) 어떤 곳인지와 가 볼 만한 이유, 방문 팁 한두 개도 함께\n':''}1) 한 문장 소개 — 한국어 이름은 살리고(로마자 표기) 짧은 설명을 붙여서\n2) 30초 설명 — 친구에게 말하듯 3~4문장, 쉬운 영어로\n3) 비유와 주의점 — 외국 문화와 비슷한 점으로 연결하되, 오해를 부를 수 있는 비유는 짚어 줘\n4) 외국인이 물어볼 만한 질문 2~3개와 자연스러운 답\n5) 꼭 알아 둘 영어 표현 2~3개 (우리말 뜻과 함께)\n6) 한·영 차이 포인트 한 줄`
       +block('소개 :: 주제(한국어) :: 한 문장 영어 소개 :: 그 영어 문장의 자연스러운 우리말 뜻 :: 비유·주의점 한 줄 :: 분류','- 그 아래 외국인 질문은 이 형식으로 최대 2줄: 문답 :: 외국인 질문(영어) :: 자연스러운 답(영어) :: 메모 :: 분류\n- 외국인 질문에는 it·they·this 같은 대명사 대신 주제 이름(로마자)을 꼭 넣어서, 질문만 따로 봐도 무엇을 묻는지 알 수 있게 해 줘 (예: Is it spicy? → Is kimchi always spicy?)\n- 핵심 영어 표현은 이 형식으로 최대 2줄: 찰떡 :: 우리말 :: 영어 :: '+EX_FMT+' :: 쓰임 장면 :: 분류\n- '+CAT_RULE+'\n- '+YG_RULE)},
-  room:{i:'board',e:'',n:'교실 영어',hint:'수업 장면의 말을 원어민 교사 영어로 바꿔요',out:'퀴즈: 수업 장면 보고 영어로 말하기',
+  room:{i:'board',e:'',n:'교실 영어',hint:'수업 장면을 원어민 교사 영어로 바꿔요',out:'퀴즈: 수업 장면 보고 영어로 말하기',
     ph:'예) 짝과 2분 동안 이야기해 보세요 / 조용히 하고 앞을 봐 주세요', quiz:true,
     p:q=>`나는 중학교 3학년 영어 수업을 하는 교사야. 다음 수업 장면에서 원어민 교사가 실제로 쓰는 자연스러운 교실 영어로 바꿔 줘: 「${q}」\n1) 가장 자연스러운 표현 1개 — 중3 학생이 알아들을 수 있는 쉬운 영어로\n2) 대안 2개 — 더 부드럽게 / 더 짧고 단호하게, 각각 어떤 때 쓰는지\n3) 학생이 이렇게 반응하면 이어서 할 말 한두 개 (예: 못 알아들었을 때, 대답이 없을 때)\n4) 한국 교실에서 자주 쓰는 콩글리시나 어색한 지시가 있으면 짚어 줘`
       +block('교실 :: 우리말 수업 장면 :: 영어 :: '+EX_FMT+' :: 수업 흐름(시작·활동 지시·질문·칭찬과 피드백·생활 지도·정리 중 하나) :: 분류','- 대안 표현도 쓸모 있으면 줄을 나눠 담아 줘\n- '+CAT_RULE+'\n- '+YG_RULE)},
